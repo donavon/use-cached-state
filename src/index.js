@@ -23,15 +23,15 @@ const createCachedState = (
   assert(!namespace.includes('.'), 'createCachedState: namespace may not contain a "."');
 
   // hydrate the cache with the value from the storageProvider
-  const storageValueKeys = storageProvider && storageProvider.getItem(namespace);
+  const storageValueNames = storageProvider && storageProvider.getItem(namespace);
   const cachedValues = {};
   const setters = {};
 
-  if (storageValueKeys) {
-    const keys = JSON.parse(storageValueKeys);
-    keys.forEach((key) => {
-      const json = storageProvider.getItem(`${namespace}.${key}`);
-      cachedValues[key] = JSON.parse(json);
+  if (storageValueNames) {
+    const names = JSON.parse(storageValueNames);
+    names.forEach((name) => {
+      const json = storageProvider.getItem(`${namespace}.${name}`);
+      cachedValues[name] = JSON.parse(json);
     });
   }
 
@@ -42,11 +42,11 @@ const createCachedState = (
     element.addEventListener('storage', ({ key: eventKey, newValue }) => {
       const [ns, ...keySegments] = eventKey.split('.');
       if (namespace === ns) {
-        const key = keySegments.join('.');
-        if (key) {
+        const name = keySegments.join('.');
+        if (name) {
           const value = JSON.parse(newValue);
-          cachedValues[key] = value;
-          (setters[key] || []).forEach((setter) => {
+          cachedValues[name] = value;
+          (setters[name] || []).forEach((setter) => {
             setter(value);
           });
         }
@@ -55,24 +55,24 @@ const createCachedState = (
   }
 
   // this is the custom hook that will be returned from createCachedState
-  const useCachedState = ({ key = 'default', initialValue }) => {
+  const useCachedState = ({ name = 'default', initialValue }) => {
     const self = useInstance(() => {
-      if (!(key in cachedValues)) {
+      if (!(name in cachedValues)) {
         const value = typeof initialValue === 'function' ? initialValue() : initialValue;
-        cachedValues[key] = value;
+        cachedValues[name] = value;
       }
       return { shouldPersistState: false };
     });
-    const [state, setState] = useState(cachedValues[key]);
+    const [state, setState] = useState(cachedValues[name]);
 
     // add/remove this setState to/from array of setters on mount/unmount
     useEffect(() => {
-      const currentSetters = setters[key] || [];
-      setters[key] = [...currentSetters, setState];
+      const currentSetters = setters[name] || [];
+      setters[name] = [...currentSetters, setState];
       return () => {
-        setters[key] = setters[key].filter(setter => setter === setState);
+        setters[name] = setters[name].filter(setter => setter === setState);
       };
-    }, [key]);
+    }, [name]);
 
     const setAllInstances = useCallback(
       (valueOrFunction) => {
@@ -80,20 +80,20 @@ const createCachedState = (
         // so tell this instance to persist on the next function interaction
         // (below in useEffect)
         self.shouldPersistState = true;
-        setters[key].forEach((setter) => {
+        setters[name].forEach((setter) => {
           setter(valueOrFunction);
         });
       },
-      [key, self]
+      [name, self]
     );
 
     useEffect(() => {
       if (self.shouldPersistState) {
         // cache the actual state value and optionally persist to the storageProvider
         self.shouldPersistState = false;
-        cachedValues[key] = state;
+        cachedValues[name] = state;
         if (storageProvider) {
-          storageProvider.setItem(`${namespace}.${key}`, JSON.stringify(state));
+          storageProvider.setItem(`${namespace}.${name}`, JSON.stringify(state));
           storageProvider.setItem(namespace, JSON.stringify(Object.keys(cachedValues)));
         }
       }

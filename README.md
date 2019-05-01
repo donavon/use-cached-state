@@ -4,6 +4,8 @@ A cached and optionally persisted alternative to useState.
 
 [![npm version](https://badge.fury.io/js/use-cached-state.svg)](https://badge.fury.io/js/use-cached-state)
 
+![use-cached-state](https://user-images.githubusercontent.com/887639/57014924-3e163580-6be0-11e9-85ca-c60166372e53.gif)
+
 ## Features
 
 💰 Caches state values even after your component unmounts.
@@ -55,7 +57,7 @@ const [state, setState] = useCachedState(options);
 
 | Property       | Description                                                                                     |
 | :------------- | :--------------------- |
-| `key` | A optional string that represents the key to use for this instance of the component. If all instances are to share the same state, pass the same key (or use the default). |
+| `name` | A optional string that represents the name to use for this instance of the component. If all instances are to share the same state, pass the same name (or use the default). |
 | `initialValue` | This will be the initial value used. |
 
 ## Example
@@ -69,9 +71,9 @@ const useCachedCounterState = createCachedState({
   storageProvider: localStorage,
 });
 
-const CountButton = ({ instanceName, initialValue }) => {
+const CountButton = ({ name, initialValue }) => {
   const [count, setCount] = useCachedCounterState({
-    key: instanceName,
+    name,
     initialValue,
   });
   const increment = () => setCount(c => c + 1);

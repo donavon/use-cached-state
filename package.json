@@ -4,7 +4,7 @@
     "access": "public",
     "tag": "next"
   },
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": "A cached and optionally persisted alternative to useState.",
   "main": "dist/use-cached-state.js",
   "umd:main": "dist/use-cached-state.umd.js",

@@ -31,7 +31,7 @@ const createMockStorage = () => {
 };
 
 const namespace = 'NS';
-const defaultKey = 'default';
+const defaultName = 'default';
 
 describe('createCachedState', () => {
   it('will throw an exception if not passed any arguments', () => {
@@ -148,8 +148,8 @@ describe('useCachedState', () => {
 
     expect(value).toBe('bar');
     setTimeout(() => {
-      expect(storageProvider._values[namespace]).toBe(JSON.stringify([defaultKey]));
-      expect(storageProvider._values[`${namespace}.${defaultKey}`]).toBe(JSON.stringify('bar'));
+      expect(storageProvider._values[namespace]).toBe(JSON.stringify([defaultName]));
+      expect(storageProvider._values[`${namespace}.${defaultName}`]).toBe(JSON.stringify('bar'));
       done();
     }, 1);
   });
@@ -172,8 +172,8 @@ describe('useCachedState', () => {
   it('will hydrate value from localStorage`', () => {
     const element = createMockElement();
     const storageProvider = createMockStorage();
-    storageProvider.setItem(namespace, JSON.stringify([defaultKey]));
-    storageProvider.setItem(`${namespace}.${defaultKey}`, JSON.stringify('bar'));
+    storageProvider.setItem(namespace, JSON.stringify([defaultName]));
+    storageProvider.setItem(`${namespace}.${defaultName}`, JSON.stringify('bar'));
 
     const useCachedState = createCachedState({
       namespace, element, storageProvider,
@@ -190,8 +190,8 @@ describe('useCachedState', () => {
   it('will hydrate value from localStorage (even if value is null)`', () => {
     const element = createMockElement();
     const storageProvider = createMockStorage();
-    storageProvider.setItem(namespace, JSON.stringify([defaultKey]));
-    storageProvider.setItem(`${namespace}.${defaultKey}`, JSON.stringify(null));
+    storageProvider.setItem(namespace, JSON.stringify([defaultName]));
+    storageProvider.setItem(`${namespace}.${defaultName}`, JSON.stringify(null));
 
     const useCachedState = createCachedState({
       namespace, element, storageProvider,
@@ -212,7 +212,7 @@ describe('useCachedState', () => {
       namespace, element, storageProvider,
     });
 
-    const event = { type: 'storage', key: `${namespace}.${defaultKey}`, newValue: JSON.stringify('bar') };
+    const event = { type: 'storage', key: `${namespace}.${defaultName}`, newValue: JSON.stringify('bar') };
     element.dispatchEvent(event);
 
     let value;
@@ -235,7 +235,7 @@ describe('useCachedState', () => {
     });
 
     const event = new Event('storage');
-    event.key = `${namespace}.${defaultKey}`;
+    event.key = `${namespace}.${defaultName}`;
     event.newValue = JSON.stringify('bar');
     global.dispatchEvent(event);
 
@@ -245,26 +245,26 @@ describe('useCachedState', () => {
     }, 1);
   });
 
-  it('can accept a non-default key with "."s', () => {
+  it('can accept a non-default name with "."s', () => {
     const element = createMockElement();
     const storageProvider = createMockStorage();
     const useCachedState = createCachedState({
       namespace, element, storageProvider,
     });
-    const keyWithDots = 'foo.bar';
+    const nameWithDots = 'foo.bar';
 
-    const event = { type: 'storage', key: `${namespace}.${keyWithDots}`, newValue: JSON.stringify('bar') };
+    const event = { type: 'storage', key: `${namespace}.${nameWithDots}`, newValue: JSON.stringify('bar') };
     element.dispatchEvent(event);
 
     let value;
     renderHook(() => {
-      [value] = useCachedState({ initialValue: 'foo', key: keyWithDots });
+      [value] = useCachedState({ initialValue: 'foo', name: nameWithDots });
     });
 
     expect(value).toBe('bar');
   });
 
-  it('will not hydrate value from storage events that do not match key`', () => {
+  it('will not hydrate value from storage events that do not match name`', () => {
     const element = createMockElement();
     const storageProvider = createMockStorage();
     const useCachedState = createCachedState({
@@ -307,7 +307,7 @@ describe('useCachedState', () => {
       namespace, element, storageProvider,
     });
 
-    const event = { type: 'storage', key: `${namespace}.${defaultKey}`, newValue: JSON.stringify('bar') };
+    const event = { type: 'storage', key: `${namespace}.${defaultName}`, newValue: JSON.stringify('bar') };
 
     let value;
     renderHook(() => {
@@ -321,7 +321,7 @@ describe('useCachedState', () => {
     }, 1);
   });
 
-  it('will ignore storage events that do not match key`', (done) => {
+  it('will ignore storage events that do not match name`', (done) => {
     const element = createMockElement();
     const storageProvider = createMockStorage();
     const useCachedState = createCachedState({
