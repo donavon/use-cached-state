@@ -1,8 +1,13 @@
 {
   "extends": "amex",
+  "plugins": [
+    "react-hooks"
+  ],
   "rules": {
     "consistent-return": 0,
     "react/jsx-filename-extension": 0,
-    "unicorn/explicit-length-check": 0
+    "unicorn/explicit-length-check": 0,
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   }
 }
